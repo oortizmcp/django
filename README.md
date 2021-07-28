@@ -223,7 +223,8 @@ Goal for this tutorial is provide a step by step from setting up your environmen
         <li>Image Source: Azure Container Registry </li>
         <li> Select Registry, Image and Tag you created earlier</li>
     </ul>
-         
+    
+<p>
     b. Go to Azure Devops project repo 
     c. Select Setup a Build or Create a new Pipeline from the Pipeline blade
     d. In the Configure your pipeline section, select Docker (build and push an image to Azure Container Registry)
