@@ -224,12 +224,12 @@ Goal for this tutorial is provide a step by step from setting up your environmen
         <li> Select Registry, Image and Tag you created earlier</li>
     </ul>
          
-    b. Go to Azure Devops project repo <br>
-    c. Select Setup a Build or Create a new Pipeline from the Pipeline blade <br>
-    d. In the Configure your pipeline section, select Docker (build and push an image to Azure Container Registry) <br>
-    e. Select your Subscription <br>
-    f. Select your Container registry <br>
-    g. Review your code and change tag in the variable section from '$(Build.BuildId) to 'latest' <br>
+    b. Go to Azure Devops project repo 
+    c. Select Setup a Build or Create a new Pipeline from the Pipeline blade
+    d. In the Configure your pipeline section, select Docker (build and push an image to Azure Container Registry)
+    e. Select your Subscription
+    f. Select your Container registry
+    g. Review your code and change tag in the variable section from '$(Build.BuildId) to 'latest'
 
 
 <h3> Make a change on color or text on base.html, push changes to repo and validate changes. (Note: Webapp will refresh when pipeline finish running and it may take a few minutes to reflect changes.) </h3>
