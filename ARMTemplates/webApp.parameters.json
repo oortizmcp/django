@@ -10,12 +10,6 @@
         },
         "webappName": {
             "value": "oovdjangoblog2"
-        },
-        "registryName": {
-            "value": "oovdjangoblogacr"
-        },
-        "registryScope": {
-            "value": "django:latest"
         }
     }
 }
