@@ -29,10 +29,10 @@
             "name": "[parameters('web-ASPName')]",
             "location": "[parameters('location')]",
             "sku": {
-                "name": "F1",
-                "tier": "Free",
-                "size": "F1",
-                "family": "F",
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
                 "capacity": 1
             },
             "kind": "linux",
