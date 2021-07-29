@@ -10,7 +10,7 @@ env:
   CONTAINER_REGISTRY: ${{ secrets.REGISTRY_URL }}
   AZURE_RESOURCE_GROUP: rg-djangoapp2
   AZURE_APP_PLAN: oovdjangoblog2-asp
-  WEBHOOK_NAME: whook{{ env.AZURE_WEBAPP_NAME}}
+  WEBHOOK_NAME: whookoovdjangoblog2
 
 
 jobs:
