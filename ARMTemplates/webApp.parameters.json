@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "web-ASPName": {
+            "value": "oovdjangoblog2-asp"
+        },
+        "location": {
+            "value": "Central US"
+        },
+        "webappName": {
+            "value": "oovdjangoblog2"
+        },
+        "registryName": {
+            "value": "oovdjangoblogacr"
+        },
+        "registryScope": {
+            "value": "django:latest"
+        }
+    }
+}

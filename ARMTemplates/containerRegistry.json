@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "registryName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Container Registry"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of resources"
+            }
+        },
+        "registryScope": {
+            "type": "string",
+            "metadata": {
+                "description": "Scope for registry ex: django:latest"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "apiVersion": "2021-06-01-preview",
+            "name": "[parameters('registryName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard"
+            },
+            "properties": {
+                "adminUserEnabled": true,
+                "policies": {
+                    "quarantinePolicy": {
+                        "status": "disabled"
+                    },
+                    "trustPolicy": {
+                        "type": "Notary",
+                        "status": "disabled"
+                    },
+                    "retentionPolicy": {
+                        "days": 7,
+                        "status": "disabled"
+                    },
+                    "exportPolicy": {
+                        "status": "enabled"
+                    }
+                },
+                "encryption": {
+                    "status": "disabled"
+                },
+                "dataEndpointEnabled": false,
+                "publicNetworkAccess": "Enabled",
+                "networkRuleBypassOptions": "AzureServices",
+                "zoneRedundancy": "Disabled",
+                "anonymousPullEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries/webhooks",
+            "apiVersion": "2021-06-01-preview",
+            "name": "[concat(parameters('registryName'),'/webappoovdjangoblog')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', parameters('registryName'))]"
+            ],
+            "properties": {
+                "status": "enabled",
+                "scope": "[parameters('registryScope')]",
+                "actions": [
+                    "push"
+                ],
+                "serviceUri": null
+            }
+        }
+    ]
+}
