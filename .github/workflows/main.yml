@@ -10,6 +10,7 @@ env:
   CONTAINER_REGISTRY: ${{ secrets.REGISTRY_URL }}
   AZURE_RESOURCE_GROUP: rg-djangoapp2
   AZURE_APP_PLAN: oovdjangoblog2-asp
+  WEBHOOK_NAME: whook{{ env.AZURE_WEBAPP_NAME}}
 
 
 jobs:
@@ -77,10 +78,10 @@ jobs:
         app-name: ${{ env.AZURE_WEBAPP_NAME }} 
         images: ${{ env.CONTAINER_REGISTRY }}/djangoapp2:${{ github.sha }}
 
-   
-        
-    - name: Update image tag on the Azure Web App
-      uses: azure/webapps-container-deploy@v1
+    # 
+    - name: Create Container Registry Webhook to WebApp
+      uses: Azure/cli@1.0.4
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME}}
-        images: ${{ env.CONTAINER_REGISTRY }}/djangoapp2:${{ github.sha }}
+        inlineScript: 
+          ci_cd_url=$(az webapp deployment container config --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP}} --enable-cd true --query CI_CD_URL --output tsv)
+          az acr webhook create --name ${{ env.WEBHOOK_NAME }} --registry ${{ env.CONTAINER_REGISTRY}} --resource-group ${{ env.AZURE_RESOURCE_GROUP}} --actions push --uri $ci_cd_url --scope djangoapp2:${{ github.sha }}
