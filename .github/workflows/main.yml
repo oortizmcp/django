@@ -1,0 +1,92 @@
+name: Build and deploy a container image to Azure Web Apps
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  AZURE_WEBAPP_NAME: oovdjangoblog2
+  CONTAINER_REGISTRY: ${{ secrets.REGISTRY_URL }}
+  AZURE_RESOURCE_GROUP: rg-djangoapp2
+  AZURE_APP_PLAN: oovdjangoblog2-asp
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@main
+    - name: Authenticate using a Service Principal
+      uses: azure/actions/login@v1
+      with:
+        creds: ${{ secrets.AZURE_SP }}
+        
+    - name: Create Container Registry (ARM) Template
+      uses: Azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SP.subscriptionId }}
+        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+        template: ./ARMTemplates/containerRegistry.json
+        parameters: ./ARMTemplates/containerRegistry.parameters.json
+  
+       
+        
+    - uses: azure/container-actions/docker-login@v1
+      with:
+        username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+
+    - name: Build and push the image tagged with the git commit hash
+      run: |
+        docker build . -t ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
+        docker push ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }} 
+
+    - name: Create WebApp (ARM) Template
+      uses: Azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SP.subscriptionId }}
+        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+        template: ./ARMTemplates/webApp.json
+        parameters: ./ARMTemplates/webApp.parameters.json
+        
+# Uncomment the below action snippet if the Web app credentials are not updated as web app settings
+#     - name: Set Web App ACR authentication
+#       uses: Azure/appservice-settings@v1
+#       with:
+#         app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+#         app-settings-json: |
+#           [
+#               {
+#                   "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+#                   "value": "${{ secrets.REGISTRY_PASSWORD }}",
+#                   "slotSetting": false
+#               },
+#               {
+#                   "name": "DOCKER_REGISTRY_SERVER_URL",
+#                   "value": "https://${{ env.CONTAINER_REGISTRY }}",
+#                   "slotSetting": false
+#               },
+#               {
+#                   "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+#                   "value": "${{ secrets.REGISTRY_USERNAME  }}",
+#                   "slotSetting": false
+#               }
+#           ]
+
+    - name: 'Deploy to Azure Web App for Container'
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+        images: ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
+#         startup-command: 'npm start'    # Include start up command to start the app container
+
+
+        
+        
+    - name: Update image tag on the Azure Web App
+      uses: azure/webapps-container-deploy@v1
+      with:
+        app-name: '<your-webapp-name>'
+        slot-name: '<your-slot-name>'
+        images: 'contoso/demo:${{ github.sha }}'
