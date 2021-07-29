@@ -83,5 +83,5 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         inlineScript: 
-          ci_cd_url=$(az webapp deployment container config --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP}} --enable-cd true --query CI_CD_URL --output tsv)
+          export ci_cd_url=$(az webapp deployment container config --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP}} --enable-cd true --query CI_CD_URL --output tsv)
           az acr webhook create --name ${{ env.WEBHOOK_NAME }} --registry ${{ env.CONTAINER_REGISTRY}} --resource-group ${{ env.AZURE_RESOURCE_GROUP}} --actions push --uri $ci_cd_url --scope djangoapp2:${{ github.sha }}
