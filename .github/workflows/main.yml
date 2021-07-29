@@ -32,7 +32,7 @@ jobs:
 
     - name: Build and push the image tagged with the git commit hash
       run: |
-        docker build . -t ${{ env.CONTAINER_REGISTRY }}/djangoapp2:${{ github.sha }}
+        docker build . -t ${{ env.CONTAINER_REGISTRY }}/djangoapp2:${{ github.sha }} djangoprjt/Dockerfile
         docker push ${{ env.CONTAINER_REGISTRY }}/djangoapp2:${{ github.sha }} 
 
     - name: Create WebApp (ARM) Template
