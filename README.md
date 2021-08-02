@@ -63,7 +63,10 @@ Goal for this tutorial is provide a step by step from setting up your environmen
 <h3>4. Adding Models to the Administration Site </h3><br>
     a. Open your <app>/admin.py and register the Post model there as follows and save it:
 
-        
+        from django.contrib import admin
+        from .models import Post 
+
+        admin.site.register(Post)
 
 
 <p> b. Refresh page and you should see the post Model <br>
@@ -101,7 +104,7 @@ Goal for this tutorial is provide a step by step from setting up your environmen
 
 <p>
 <h3>6. Adding URL patterns for Views </h3> <br>
-    a. Create urls.py file inside your <app> folder and add the following code: <br>
+    a. Create urls.py file inside your app folder and add the following code: <br>
 
         from . import views
         from django.urls import path
@@ -112,7 +115,7 @@ Goal for this tutorial is provide a step by step from setting up your environmen
         ]
 
 <p>
-    b. Open <project>/urls.py and add the following code in the URL patterns: <br>
+    b. Open yourproject/urls.py and add the following code in the URL patterns: <br>
 
         from django.contrib import admin
         from django.urls import path, include
@@ -149,7 +152,7 @@ Goal for this tutorial is provide a step by step from setting up your environmen
         ]
 
 <p>
-    e. Create a folder called templates inside the <app> folder, and create base.html, index.html, post_detail.html, and sidebar.html <br>
+    e. Create a folder called templates inside the app folder, and create base.html, index.html, post_detail.html, and sidebar.html <br>
         (look for sample code inside blogapp/templates)<br>
 <p>
 <h3>7. Containerize your app </h3><br>
@@ -188,13 +191,13 @@ Goal for this tutorial is provide a step by step from setting up your environmen
 
 <p>
 <h3>4. Build and Test your Image</h3> <br>
-    a. From your project folder, run command - docker build -t django-app <br>
+    a. From your project folder, run command - docker build -t giveanametoyourtag ex: django-app <br>
     b. Run command - docker run -p 8000:8000 django-app <br>
     c. Validate your app is running on localhost <br>
 
 <p>
 <h3>5. Login to Container registry </h3> <br>
-    a. Run az acr login -n <acrname> <br>
+    a. Run az acr login -n youracrname <br>
     b. Adjust the docker compose file in the image field to the following: <br>
 
         services:
@@ -207,11 +210,39 @@ Goal for this tutorial is provide a step by step from setting up your environmen
             - 8000:8000
 <p>
     c. Run command docker-compose up and validate is still visible locally. Make sure to run this from the same folder where the Dockerfile is. <br>
-    d. Push the image to the registry by right click on the docker image and push or run command - docker push <yourcontainerregistryloginserver/django-app:latest> <br>
+    d. Push the image to the registry by right click on the docker image and push or run command - docker push yourcontainerregistryloginserver/django-app:latest <br>
     e. Validate repository image is visible on Azure. <br>
 
 <p>
- <h3>6. Deploy image into Azure WebApp using CI/CD pipeline</h3> <br>
+
+<h3> 6. Deploy image using CI/CD Pipeline with Github Actions (Preferred Method) </h3><br>
+        a. Create a directory in the top folder or your repo called ARMTemplates
+        b. Create file inside ARMTemplates called webApp.json you can use templates in https://github.com/oortizmcp/django/tree/main/ARMTemplates as an examples.
+        c. In the .gitignore file, add the .vscode and the *venv/ to avoid pushing these files into the repo.
+        d. Commit your code to your repo in Github.
+            1) git status
+            2) git add .
+            3) git commit -m 'your message in the commit'
+            4) git push
+        e. Go to Settings Tab- Secrets and add the following repository secrets:
+            1) AZURE_SP - in azure portal or in commandline, run az ad sp create-for-rbac --name "yourspnnamehere" --role contributor --scopes /subscriptions/yoursubid --sdk-auth and copy the json output into the value for this secret
+            2) REGISTRY_PASSWORD - go to Access Keys in your AZ Container registry and enable the Admin User, copy the password and paste it in the value for the registry passsword
+            3) REGISTRY_URL - copy the registry Login Server value
+            4) REGISTRY_USERNAME - copy the Username value
+        f. Go to Actions tab and click on new Workflow- Set up a workflow yourself
+        g. Go to https://github.com/oortizmcp/django/blob/main/.github/workflows/main.yml click in the Raw button and paste it in your new workflow
+        h. Edit the env section and adjust it as necessary according to your needs. 
+            (note: The ${{ secrets.REGISTRY_URL}} is making reference to the secrets you created in step 6e)
+        i. in Section Build and push the image tagged with the git commit hash, make sure to change to directory where your project is example: cd yourdjangoprjtfolder
+        j. Save it and see how the pipeline runs.
+
+    Note: Webapp might not reflect the changes immediately after your pipeline runs you might need to restart the webapp from the portal. Also, remember to add the Azure website into the ALLOWED_HOSTS section in the settings.py file.
+
+<h4> Make a change on color or text on base.html, push changes to repo and validate changes. (Note: Webapp will refresh when pipeline finish running and it may take a few minutes to reflect changes.) </h4>
+
+
+
+ <h3>*6. Deploy image into Azure WebApp using CI/CD pipeline (Azure Devops)</h3> <br>
     a. Go to Azure Portal and create a webApp with the following Specs:<br>
     <ul>Project Details
         <li>web app name (note: has to be unique) </li>
@@ -232,6 +263,7 @@ Goal for this tutorial is provide a step by step from setting up your environmen
     f. Select your Container registry. <br>
     g. Review your code and change tag in the variable section from '$(Build.BuildId) to 'latest'. <br>
 
+Note: This will always look at the latest, preferred method to deploy is github actions. Please refer to documentation for best practices here: https://docs.microsoft.com/en-us/azure/app-service/deploy-best-practices#continuously-deploy-containers 
 
 <h4> Make a change on color or text on base.html, push changes to repo and validate changes. (Note: Webapp will refresh when pipeline finish running and it may take a few minutes to reflect changes.) </h4>
 
