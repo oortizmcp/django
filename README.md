@@ -1,5 +1,5 @@
 # Introduction 
-This project is to demonstrate how to containerize Django App with a separate Database (PostgreSQL) and deploy it to Azure.
+This project is to demonstrate how create a blog, containerize Django Application with Docker file, push the image into a Container Registry and Azure Web App automatically.
 
 
 # Getting Started
